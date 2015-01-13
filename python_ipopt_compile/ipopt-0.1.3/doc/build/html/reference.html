@@ -1,0 +1,433 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Reference &mdash; cyipopt 0.1.3 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="cyipopt 0.1.3 documentation" href="index.html" />
+    <link rel="prev" title="Tutorial" href="tutorial.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tutorial.html" title="Tutorial"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">cyipopt 0.1.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="reference">
+<span id="id1"></span><h1>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h1>
+<p>This is the class and function reference of cyipopt. Please refer to
+the <a class="reference internal" href="tutorial.html#tutorial"><em>tutorial</em></a> for further details, as the class and
+function raw specifications may not be enough to give full guidelines on their
+uses.</p>
+<dl class="class">
+<dt id="ipopt.problem">
+<em class="property">class </em><code class="descclassname">ipopt.</code><code class="descname">problem</code><a class="headerlink" href="#ipopt.problem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper class for solving optimization problems using the C interface of
+the IPOPT package.</p>
+<p>It can be used to solve general nonlinear programming problems of the form:</p>
+<div class="math">
+<p><span class="math">\min_ {x \in R^n} f(x)</span></p>
+</div><p>subject to</p>
+<div class="math">
+<p><span class="math">g_L \leq g(x) \leq g_U
+
+x_L \leq  x  \leq x_U</span></p>
+</div><p>Where <span class="math">x</span> are the optimization variables (possibly with upper an lower
+bounds), <span class="math">f(x)</span> is the objective function and <span class="math">g(x)</span> are the general nonlinear
+constraints. The constraints, <span class="math">g(x)</span>, have lower and upper bounds. Note that
+equality constraints can be specified by setting <span class="math">g^i_L = g^i_U</span>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>n</strong> : integer</p>
+<blockquote>
+<div><p>Number of primal variables.</p>
+</div></blockquote>
+<p><strong>m</strong> : integer</p>
+<blockquote>
+<div><p>Number of constraints</p>
+</div></blockquote>
+<p><strong>problem_obj: object</strong> :</p>
+<blockquote>
+<div><p>An object with the following attributes (holding the problam&#8217;s callbacks)</p>
+<blockquote>
+<div><ul>
+<li><dl class="first docutils">
+<dt>&#8216;objective&#8217; <span class="classifier-delimiter">:</span> <span class="classifier">function pointer</span></dt>
+<dd><p class="first last">Callback function for evaluating objective function.
+The callback functions accepts one parameter: x (value of the
+optimization variables at which the objective is to be evaluated).
+The function should return the objective function value at the point x.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>&#8216;constraints&#8217; <span class="classifier-delimiter">:</span> <span class="classifier">function pointer</span></dt>
+<dd><p class="first last">Callback function for evaluating constraint functions.
+The callback functions accepts one parameter: x (value of the
+optimization variables at which the constraints are to be evaluated).
+The function should return the constraints values at the point x.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>&#8216;gradient&#8217; <span class="classifier-delimiter">:</span> <span class="classifier">function pointer</span></dt>
+<dd><p class="first last">Callback function for evaluating gradient of objective function.
+The callback functions accepts one parameter: x (value of the
+optimization variables at which the gradient is to be evaluated).
+The function should return the gradient of the objective function at the
+point x.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>&#8216;jacobian&#8217; <span class="classifier-delimiter">:</span> <span class="classifier">function pointer</span></dt>
+<dd><p class="first last">Callback function for evaluating Jacobian of constraint functions.
+The callback functions accepts one parameter: x (value of the
+optimization variables at which the jacobian is to be evaluated).
+The function should return the values of the jacobian as calculated
+using x. The values should be returned as a 1-dim numpy array (using
+the same order as you used when specifying the sparsity structure)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>&#8216;jacobianstructure&#8217; <span class="classifier-delimiter">:</span> <span class="classifier">function pointer</span></dt>
+<dd><p class="first last">Optional. Callback function that accepts no parameters and returns the
+sparsity structure of the Jacobian (the row and column indices only).
+If None, the Jacobian is assumed to be dense.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>&#8216;hessian&#8217; <span class="classifier-delimiter">:</span> <span class="classifier">function pointer</span></dt>
+<dd><p class="first last">Optional. Callback function for evaluating Hessian of the Lagrangian
+function.
+The callback functions accepts three parameters x (value of the
+optimization variables at which the hessian is to be evaluated), lambda
+(values for the constraint multipliers at which the hessian is to be
+evaluated) objective_factor the factor in front of the objective term
+in the Hessian.
+The function should return the values of the Hessian as calculated using
+x, lambda and objective_factor. The values should be returned as a 1-dim
+numpy array (using the same order as you used when specifying the
+sparsity structure).
+If None, the Hessian is calculated numerically.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>&#8216;hessianstructure&#8217; <span class="classifier-delimiter">:</span> <span class="classifier">function pointer</span></dt>
+<dd><p class="first last">Optional. Callback function that accepts no parameters and returns the
+sparsity structure of the Hessian of the lagrangian (the row and column
+indices only). If None, the Hessian is assumed to be dense.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>&#8216;intermediate&#8217; <span class="classifier-delimiter">:</span> <span class="classifier">function pointer</span></dt>
+<dd><p class="first">Optional. Callback function that is called once per iteration (during
+the convergence check), and can be used to obtain information about the
+optimization status while IPOPT solves the problem.
+If this callback returns False, IPOPT will terminate with the
+User_Requested_Stop status.
+The information below corresponeds to the argument list passed to this
+callback:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>&#8216;alg_mod&#8217;:</dt>
+<dd><p class="first last">Algorithm phase: 0 is for regular, 1 is restoration.</p>
+</dd>
+<dt>&#8216;iter_count&#8217;:</dt>
+<dd><p class="first last">The current iteration count.</p>
+</dd>
+<dt>&#8216;obj_value&#8217;:</dt>
+<dd><p class="first last">The unscaled objective value at the current point</p>
+</dd>
+<dt>&#8216;inf_pr&#8217;:</dt>
+<dd><p class="first last">The scaled primal infeasibility at the current point.</p>
+</dd>
+<dt>&#8216;inf_du&#8217;:</dt>
+<dd><p class="first last">The scaled dual infeasibility at the current point.</p>
+</dd>
+<dt>&#8216;mu&#8217;:</dt>
+<dd><p class="first last">The value of the barrier parameter.</p>
+</dd>
+<dt>&#8216;d_norm&#8217;:</dt>
+<dd><p class="first last">The infinity norm (max) of the primal step.</p>
+</dd>
+<dt>&#8216;regularization_size&#8217;:</dt>
+<dd><p class="first last">The value of the regularization term for the Hessian
+of the Lagrangian in the augmented system.</p>
+</dd>
+<dt>&#8216;alpha_du&#8217;:</dt>
+<dd><p class="first last">The stepsize for the dual variables.</p>
+</dd>
+<dt>&#8216;alpha_pr&#8217;:</dt>
+<dd><p class="first last">The stepsize for the primal variables.</p>
+</dd>
+<dt>&#8216;ls_trials&#8217;:</dt>
+<dd><p class="first last">The number of backtracking line search steps.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p class="last">more information can be found in the following link:
+<a class="reference external" href="http://www.coin-or.org/Ipopt/documentation/node56.html#sec:output">http://www.coin-or.org/Ipopt/documentation/node56.html#sec:output</a></p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</div></blockquote>
+<p><strong>lb</strong> : array-like, shape = [n]</p>
+<blockquote>
+<div><p>Lower bounds on variables, where n is the dimension of x.
+To assume no lower bounds pass values lower then 10^-19.</p>
+</div></blockquote>
+<p><strong>ub</strong> : array-like, shape = [n]</p>
+<blockquote>
+<div><p>Upper bounds on variables, where n is the dimension of x..
+To assume no upper bounds pass values higher then 10^-19.</p>
+</div></blockquote>
+<p><strong>cl</strong> : array-like, shape = [m]</p>
+<blockquote>
+<div><p>Lower bounds on constraints, where m is the number of constraints.
+Equality constraints can be specified by setting cl[i] = cu[i].</p>
+</div></blockquote>
+<p><strong>cu</strong> : array-like, shape = [m]</p>
+<blockquote class="last">
+<div><p>Upper bounds on constraints, where m is the number of constraints.
+Equality constraints can be specified by setting cl[i] = cu[i].</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="ipopt.problem.addOption">
+<code class="descname">addOption</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ipopt.problem.addOption" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a keyword/value option pair to the problem. See the IPOPT
+documentaion for details on available options.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>keyword</strong> : string,</p>
+<blockquote>
+<div><p>Option name.</p>
+</div></blockquote>
+<p><strong>val</strong> : string / int / float</p>
+<blockquote>
+<div><p>Value of the option. The type of val should match the option
+definition as described in the IPOPT documentation.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>None</strong> :</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ipopt.problem.close">
+<code class="descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ipopt.problem.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deallcate memory resources used by the IPOPT package. Called implicitly
+by the &#8216;problem&#8217; class destructor.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>None</strong> :</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>None</strong> :</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ipopt.problem.setProblemScaling">
+<code class="descname">setProblemScaling</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ipopt.problem.setProblemScaling" title="Permalink to this definition">¶</a></dt>
+<dd><p>Optional function for setting scaling parameters for the problem.
+To use the scaling parameters set the option &#8216;nlp_scaling_method&#8217; to
+&#8216;user-scaling&#8217;.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>obj_scaling</strong> : float,</p>
+<blockquote>
+<div><p>Determines, how IPOPT should internally scale the objective function.
+For example, if this number is chosen to be 10, then IPOPT solves
+internally an optimization problem that has 10 times the value of
+the original objective. In particular, if this value is negative,
+then IPOPT will maximize the objective function instead of minimizing
+it.</p>
+</div></blockquote>
+<p><strong>x_scaling</strong> : array-like, shape = [n]</p>
+<blockquote>
+<div><p>The scaling factors for the variables. If None, no scaling is done.</p>
+</div></blockquote>
+<p><strong>g_scaling</strong> : array-like, shape = [m]</p>
+<blockquote>
+<div><p>The scaling factors for the constrains. If None, no scaling is done.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>None</strong> :</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="ipopt.problem.solve">
+<code class="descname">solve</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ipopt.problem.solve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Solve the posed optimization problem starting at point x.
+Returns the optimal solution and an info dictionary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>x</strong> : array-like, shape = [n]</p>
+<blockquote>
+<div><p>Starting point.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>x</strong> : array, shape = [n]</p>
+<blockquote>
+<div><p>Optimal solution.</p>
+</div></blockquote>
+<p><strong>info: dictionary, with following keys</strong> :</p>
+<blockquote class="last">
+<div><dl class="docutils">
+<dt>&#8216;x&#8217;:</dt>
+<dd><p class="first last">optimal solution</p>
+</dd>
+<dt>&#8216;g&#8217;:</dt>
+<dd><p class="first last">constraints at the optimal solution</p>
+</dd>
+<dt>&#8216;obj_val&#8217;:</dt>
+<dd><p class="first last">objective value at optimal solution</p>
+</dd>
+<dt>&#8216;mult_g&#8217;:</dt>
+<dd><p class="first last">final values of the constraint multipliers</p>
+</dd>
+<dt>&#8216;mult_x_L&#8217;:</dt>
+<dd><p class="first last">bound multipliers at the solution</p>
+</dd>
+<dt>&#8216;mult_x_U&#8217;:</dt>
+<dd><p class="first last">bound multipliers at the solution</p>
+</dd>
+<dt>&#8216;status&#8217;:</dt>
+<dd><p class="first last">gives the status of the algorithm</p>
+</dd>
+<dt>&#8216;status_msg&#8217;:</dt>
+<dd><p class="first last">gives the status of the algorithm as a message</p>
+</dd>
+</dl>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="tutorial.html"
+                        title="previous chapter">Tutorial</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/reference.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tutorial.html" title="Tutorial"
+             >previous</a> |</li>
+        <li><a href="index.html">cyipopt 0.1.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2012, Amit Aides.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3b2.
+    </div>
+  </body>
+</html>
